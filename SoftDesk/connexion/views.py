@@ -1,3 +1,10 @@
-from django.shortcuts import render
+from rest_framework.generics import CreateAPIView
+from django.contrib.auth import get_user_model
+from .serializers import InscriptionSerializer
 
-# Create your views here.
+User = get_user_model()
+
+
+class InscriptionAPIView(CreateAPIView):
+    serializer_class = InscriptionSerializer
+    queryset = User.objects.all()
