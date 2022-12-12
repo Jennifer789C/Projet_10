@@ -2,7 +2,7 @@ from rest_framework.serializers import ModelSerializer, ValidationError
 from .models import Projet, Probleme, Commentaire
 
 
-class ProjetSerializer(ModelSerializer):
+class ProjetListeSerializer(ModelSerializer):
     class Meta:
         model = Projet
         fields = ["id", "titre", "description", "type", "contributeurs"]
@@ -16,6 +16,12 @@ class ProjetSerializer(ModelSerializer):
         if value == "":
             raise ValidationError("Ce champ ne peut être vide.")
         return value
+
+
+class ProjetDetailSerializer(ModelSerializer):
+    class Meta:
+        model = Projet
+        fields = ["id", "titre", "description", "type", "contributeurs"]
 
 
 class ProblemeSerializer(ModelSerializer):
