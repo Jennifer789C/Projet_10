@@ -15,6 +15,7 @@ class Projet(models.Model):
     contributeurs = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                            through="connexion.Contributeur",
                                            related_name="contributions")
+    accessible = models.BooleanField(default=False)
 
 
 class Probleme(models.Model):
