@@ -3,7 +3,7 @@ from . import models
 
 
 class ProjetAdmin(admin.ModelAdmin):
-    list_display = ("id", "titre")
+    list_display = ("id", "titre", "description")
 
 
 admin.site.register(models.Projet, ProjetAdmin)

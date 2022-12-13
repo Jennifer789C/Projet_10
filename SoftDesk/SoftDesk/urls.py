@@ -15,18 +15,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers
+from rest_framework_nested import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from connexion.views import InscriptionAPIView
-from api.views import ProjetViewset
+from api.views import ProjetViewset, UserViewset
 
 router = routers.SimpleRouter()
 router.register("projects", ProjetViewset, basename="projects")
 
+user_router = routers.NestedSimpleRouter(router, "projects", lookup="projects")
+user_router.register("users", UserViewset, basename="users")
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("", include(router.urls)),
     path("login/", TokenObtainPairView.as_view()),
     path("login/refresh/", TokenRefreshView.as_view()),
     path("signup/", InscriptionAPIView.as_view()),
+    path("", include(router.urls)),
+    path("", include(user_router.urls)),
 ]

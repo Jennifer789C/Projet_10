@@ -1,9 +1,11 @@
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
-from .serializers import ProjetListeSerializer, ProjetDetailSerializer
+from .serializers import ProjetListeSerializer, ProjetDetailSerializer, \
+    ContributeurSerializer
 from .models import Projet
 from connexion.models import Contributeur
+from connexion.permissions import EstContributeur
 
 User = get_user_model()
 
@@ -34,3 +36,12 @@ class ProjetViewset(ModelViewSet):
         projet.contributeurs.add(utilisateur,
                                  through_defaults={"role": "Responsable"})
         projet.save()
+
+
+class UserViewset(ModelViewSet):
+    permission_classes = [IsAuthenticated, EstContributeur]
+    serializer_class = ContributeurSerializer
+
+    def get_queryset(self):
+        return Contributeur.objects.filter(projet=self.kwargs["projects_pk"])
+
