@@ -13,3 +13,13 @@ class EstContributeur(BasePermission):
         if request.user in liste:
             return True
         return False
+
+
+class EstResponsable(BasePermission):
+    def has_permission(self, request, view):
+        responsable = Contributeur.objects.get(
+            projet=view.kwargs["projects_pk"], role="Responsable"
+        )
+        if request.user == responsable.user:
+            return True
+        return False

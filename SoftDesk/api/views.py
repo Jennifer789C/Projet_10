@@ -5,7 +5,7 @@ from .serializers import ProjetListeSerializer, ProjetDetailSerializer, \
     ContributeurListeSerializer, ContributeurAjoutSerializer
 from .models import Projet
 from connexion.models import Contributeur
-from connexion.permissions import EstContributeur
+from connexion.permissions import EstContributeur, EstResponsable
 
 User = get_user_model()
 
@@ -39,8 +39,6 @@ class ProjetViewset(ModelViewSet):
 
 
 class UserViewset(ModelViewSet):
-    permission_classes = [IsAuthenticated, EstContributeur]
-
     def get_queryset(self):
         return Contributeur.objects.filter(projet=self.kwargs["projects_pk"])
 
@@ -49,6 +47,13 @@ class UserViewset(ModelViewSet):
             return ContributeurListeSerializer
         elif self.action == "create":
             return ContributeurAjoutSerializer
+
+    def get_permissions(self):
+        if self.action == "list":
+            permission_classes = [IsAuthenticated, EstContributeur]
+        else:
+            permission_classes = [IsAuthenticated, EstResponsable]
+        return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
         projet = Projet.objects.get(id=self.kwargs["projects_pk"])

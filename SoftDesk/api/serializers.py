@@ -30,7 +30,7 @@ class ContributeurListeSerializer(ModelSerializer):
 
     class Meta:
         model = Contributeur
-        fields = ["user", "role"]
+        fields = ["id", "user", "role"]
 
 
 class ContributeurAjoutSerializer(ModelSerializer):

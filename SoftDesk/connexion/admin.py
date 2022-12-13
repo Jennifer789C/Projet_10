@@ -10,7 +10,7 @@ admin.site.register(models.User, UserAdmin)
 
 
 class ContributeurAdmin(admin.ModelAdmin):
-    list_display = ("user", "role", "projet")
+    list_display = ("id", "user", "role", "projet")
 
 
 admin.site.register(models.Contributeur, ContributeurAdmin)
