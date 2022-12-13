@@ -4,8 +4,12 @@ from .models import Contributeur
 
 class EstContributeur(BasePermission):
     def has_permission(self, request, view):
-        contributeurs = Contributeur.objects.filter(projet=view.kwargs["projects_pk"])
+        contributeurs = Contributeur.objects.filter(
+            projet=view.kwargs["projects_pk"]
+        )
+        liste = []
         for contributeur in contributeurs:
-            if request.user == contributeur.user:
-                return True
-            return False
+            liste.append(contributeur.user)
+        if request.user in liste:
+            return True
+        return False

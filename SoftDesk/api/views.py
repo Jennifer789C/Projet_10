@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from .serializers import ProjetListeSerializer, ProjetDetailSerializer, \
-    ContributeurSerializer
+    ContributeurListeSerializer, ContributeurAjoutSerializer
 from .models import Projet
 from connexion.models import Contributeur
 from connexion.permissions import EstContributeur
@@ -40,8 +40,16 @@ class ProjetViewset(ModelViewSet):
 
 class UserViewset(ModelViewSet):
     permission_classes = [IsAuthenticated, EstContributeur]
-    serializer_class = ContributeurSerializer
 
     def get_queryset(self):
         return Contributeur.objects.filter(projet=self.kwargs["projects_pk"])
 
+    def get_serializer_class(self):
+        if self.action == "list":
+            return ContributeurListeSerializer
+        elif self.action == "create":
+            return ContributeurAjoutSerializer
+
+    def perform_create(self, serializer):
+        projet = Projet.objects.get(id=self.kwargs["projects_pk"])
+        serializer.save(projet=projet, role="Contributeur")

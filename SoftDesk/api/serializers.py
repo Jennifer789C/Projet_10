@@ -25,14 +25,20 @@ class ProjetDetailSerializer(ModelSerializer):
         fields = ["id", "titre", "description", "type", "contributeurs"]
 
 
-class ContributeurSerializer(ModelSerializer):
+class ContributeurListeSerializer(ModelSerializer):
     parent_lookup_kwargs = {"projects_pk": "projects__pk"}
-    projet = ProjetListeSerializer()
 
     class Meta:
         model = Contributeur
-        fields = ["projet", "user", "role"]
-        extra_kwargs = {"projet": {"read_only": True}}
+        fields = ["user", "role"]
+
+
+class ContributeurAjoutSerializer(ModelSerializer):
+    parent_lookup_kwargs = {"projects_pk": "projects__pk"}
+
+    class Meta:
+        model = Contributeur
+        fields = ["user"]
 
 
 class ProblemeSerializer(ModelSerializer):
