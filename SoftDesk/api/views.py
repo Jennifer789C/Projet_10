@@ -5,7 +5,8 @@ from .serializers import ProjetListeSerializer, ProjetDetailSerializer, \
     ContributeurListeSerializer, ContributeurAjoutSerializer
 from .models import Projet
 from connexion.models import Contributeur
-from connexion.permissions import EstContributeur, EstResponsable
+from connexion.permissions import EstContributeur, EstResponsable, \
+    EstResponsableProjet
 
 User = get_user_model()
 
@@ -33,10 +34,12 @@ class ProjetViewset(ModelViewSet):
         return self.detail_serializer_class
 
     def get_permissions(self):
-        if self.action == "list" or self.action == "create" or self.action == "retrieve":
+        if self.action == "create" or \
+                self.action == "list" or \
+                self.action == "retrieve":
             permission_classes = [IsAuthenticated]
         else:
-            permission_classes = [IsAuthenticated, EstResponsable]
+            permission_classes = [IsAuthenticated, EstResponsableProjet]
         return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
