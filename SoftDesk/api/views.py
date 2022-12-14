@@ -2,11 +2,12 @@ from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from .serializers import ProjetListeSerializer, ProjetDetailSerializer, \
-    ContributeurListeSerializer, ContributeurAjoutSerializer
-from .models import Projet
+    ContributeurListeSerializer, ContributeurAjoutSerializer, \
+    ProblemeListeSerializer, ProblemeDetailSerializer
+from .models import Projet, Probleme
 from connexion.models import Contributeur
 from connexion.permissions import EstContributeur, EstResponsable, \
-    EstResponsableProjet
+    EstResponsableProjet, EstAuteurProbleme
 
 User = get_user_model()
 
@@ -34,7 +35,9 @@ class ProjetViewset(ModelViewSet):
         return self.detail_serializer_class
 
     def get_permissions(self):
-        if self.action == "list" or self.action == "create" or self.action == "retrieve":
+        if self.action == "list" or \
+                self.action == "create" or \
+                self.action == "retrieve":
             permission_classes = [IsAuthenticated]
         else:
             permission_classes = [IsAuthenticated, EstResponsableProjet]
@@ -68,3 +71,25 @@ class UserViewset(ModelViewSet):
     def perform_create(self, serializer):
         projet = Projet.objects.get(id=self.kwargs["projects_pk"])
         serializer.save(projet=projet, role="Contributeur")
+
+
+class ProblemeViewset(ModelViewSet):
+    def get_queryset(self):
+        return Probleme.objects.filter(projet=self.kwargs["projects_pk"])
+
+    def get_serializer_class(self):
+        if self.action == "list" or self.action == "create":
+            return ProblemeListeSerializer
+        return ProblemeDetailSerializer
+
+    def get_permissions(self):
+        if self.action == "list" or self.action == "create" or self.action == "retrieve":
+            permission_classes = [IsAuthenticated, EstContributeur]
+        else:
+            permission_classes = [IsAuthenticated, EstAuteurProbleme]
+        return [permission() for permission in permission_classes]
+
+    def perform_create(self, serializer):
+        projet = Projet.objects.get(id=self.kwargs["projects_pk"])
+        auteur = self.request.user
+        serializer.save(projet=projet, auteur=auteur, assigne=auteur)

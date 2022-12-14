@@ -41,7 +41,27 @@ class ContributeurAjoutSerializer(ModelSerializer):
         fields = ["user"]
 
 
-class ProblemeSerializer(ModelSerializer):
+class ProblemeListeSerializer(ModelSerializer):
+    parent_lookup_kwargs = {"projects_pk": "projects__pk"}
+
+    class Meta:
+        model = Probleme
+        fields = ["id", "titre", "description", "balise", "priorite", "statut"]
+
+    def validate_titre(self, value):
+        if value == "":
+            raise ValidationError("Ce champ ne peut être vide.")
+        return value
+
+    def validate_description(self, value):
+        if value == "":
+            raise ValidationError("Ce champ ne peut être vide.")
+        return value
+
+
+class ProblemeDetailSerializer(ModelSerializer):
+    parent_lookup_kwargs = {"projects_pk": "projects__pk"}
+
     class Meta:
         model = Probleme
         fields = ["id", "titre", "description", "balise", "priorite", "statut",

@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission
 from .models import Contributeur
+from api.models import Probleme
 
 
 class EstContributeur(BasePermission):
@@ -32,5 +33,13 @@ class EstResponsableProjet(BasePermission):
             role="Responsable"
         )
         if request.user == responsable.user:
+            return True
+        return False
+
+
+class EstAuteurProbleme(BasePermission):
+    def has_permission(self, request, view):
+        probleme = Probleme.objects.get(projet=view.kwargs["pk"])
+        if request.user == probleme.auteur:
             return True
         return False

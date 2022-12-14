@@ -18,13 +18,16 @@ from django.urls import path, include
 from rest_framework_nested import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from connexion.views import InscriptionAPIView
-from api.views import ProjetViewset, UserViewset
+from api.views import ProjetViewset, UserViewset, ProblemeViewset
 
 router = routers.SimpleRouter()
 router.register("projects", ProjetViewset, basename="projects")
 
 user_router = routers.NestedSimpleRouter(router, "projects", lookup="projects")
 user_router.register("users", UserViewset, basename="users")
+
+issues_router = routers.NestedSimpleRouter(router, "projects", lookup="projects")
+issues_router.register("issues", ProblemeViewset, basename="issues")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,4 +36,5 @@ urlpatterns = [
     path("signup/", InscriptionAPIView.as_view()),
     path("", include(router.urls)),
     path("", include(user_router.urls)),
+    path("", include(issues_router.urls)),
 ]
