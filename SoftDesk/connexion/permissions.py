@@ -23,3 +23,8 @@ class EstResponsable(BasePermission):
         if request.user == responsable.user:
             return True
         return False
+
+
+class EstContributeurProjet(BasePermission):
+    def has_permission(self, request, view):
+        return
