@@ -23,3 +23,14 @@ class EstResponsable(BasePermission):
         if request.user == responsable.user:
             return True
         return False
+
+
+class EstResponsableProjet(BasePermission):
+    def has_permission(self, request, view):
+        responsable = Contributeur.objects.get(
+            projet=view.kwargs["pk"],
+            role="Responsable"
+        )
+        if request.user == responsable.user:
+            return True
+        return False
