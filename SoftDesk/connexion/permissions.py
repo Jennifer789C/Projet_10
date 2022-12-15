@@ -1,6 +1,6 @@
 from rest_framework.permissions import BasePermission
 from .models import Contributeur
-from api.models import Probleme
+from api.models import Probleme, Commentaire
 
 
 class EstContributeur(BasePermission):
@@ -41,5 +41,13 @@ class EstAuteurProbleme(BasePermission):
     def has_permission(self, request, view):
         probleme = Probleme.objects.get(id=view.kwargs["pk"])
         if request.user == probleme.auteur:
+            return True
+        return False
+
+
+class EstAuteurComment(BasePermission):
+    def has_permission(self, request, view):
+        commentaire = Commentaire.objects.get(id=view.kwargs["pk"])
+        if request.user == commentaire.auteur:
             return True
         return False

@@ -77,7 +77,24 @@ class ProblemeDetailSerializer(ModelSerializer):
                   "date", "projet", "auteur", "assigne"]
 
 
-class CommentaireSerializer(ModelSerializer):
+class CommentaireListeSerializer(ModelSerializer):
+    parent_lookup_kwargs = {"issues_pk": "issues__pk",
+                            "projects_pk": "issues__projects__pk"}
+
+    class Meta:
+        model = Commentaire
+        fields = ["id", "description"]
+
+    def validate_description(self, value):
+        if value == "":
+            raise ValidationError("Ce champ ne peut être vide.")
+        return value
+
+
+class CommentaireDetailSerializer(ModelSerializer):
+    parent_lookup_kwargs = {"issues_pk": "issues__pk",
+                            "projects_pk": "issues__projects__pk"}
+
     class Meta:
         model = Commentaire
         fields = ["id", "description", "date", "auteur", "probleme"]
