@@ -59,6 +59,15 @@ class ProblemeListeSerializer(ModelSerializer):
         return value
 
 
+class ProblemeModifSerializer(ModelSerializer):
+    parent_lookup_kwargs = {"projects_pk": "projects__pk"}
+
+    class Meta:
+        model = Probleme
+        fields = ["id", "titre", "description", "balise", "priorite", "statut",
+                  "assigne"]
+
+
 class ProblemeDetailSerializer(ModelSerializer):
     parent_lookup_kwargs = {"projects_pk": "projects__pk"}
 

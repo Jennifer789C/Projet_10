@@ -39,7 +39,7 @@ class EstResponsableProjet(BasePermission):
 
 class EstAuteurProbleme(BasePermission):
     def has_permission(self, request, view):
-        probleme = Probleme.objects.get(projet=view.kwargs["pk"])
+        probleme = Probleme.objects.get(id=view.kwargs["pk"])
         if request.user == probleme.auteur:
             return True
         return False

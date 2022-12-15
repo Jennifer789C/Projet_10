@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from .serializers import ProjetListeSerializer, ProjetDetailSerializer, \
     ContributeurListeSerializer, ContributeurAjoutSerializer, \
-    ProblemeListeSerializer, ProblemeDetailSerializer
+    ProblemeListeSerializer, ProblemeDetailSerializer, ProblemeModifSerializer
 from .models import Projet, Probleme
 from connexion.models import Contributeur
 from connexion.permissions import EstContributeur, EstResponsable, \
@@ -80,10 +80,15 @@ class ProblemeViewset(ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list" or self.action == "create":
             return ProblemeListeSerializer
-        return ProblemeDetailSerializer
+        elif self.action == "update":
+            return ProblemeModifSerializer
+        else:
+            return ProblemeDetailSerializer
 
     def get_permissions(self):
-        if self.action == "list" or self.action == "create" or self.action == "retrieve":
+        if self.action == "list" or \
+                self.action == "create" or \
+                self.action == "retrieve":
             permission_classes = [IsAuthenticated, EstContributeur]
         else:
             permission_classes = [IsAuthenticated, EstAuteurProbleme]
@@ -93,3 +98,8 @@ class ProblemeViewset(ModelViewSet):
         projet = Projet.objects.get(id=self.kwargs["projects_pk"])
         auteur = self.request.user
         serializer.save(projet=projet, auteur=auteur, assigne=auteur)
+
+    def perform_update(self, serializer):
+        projet = Projet.objects.get(id=self.kwargs["projects_pk"])
+        auteur = self.request.user
+        serializer.save(projet=projet, auteur=auteur)
