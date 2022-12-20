@@ -17,7 +17,7 @@ admin.site.register(models.Probleme, ProblemeAdmin)
 
 
 class CommentaireAdmin(admin.ModelAdmin):
-    list_display = ("id", "probleme", "auteur")
+    list_display = ("id", "description", "probleme", "auteur")
 
 
 admin.site.register(models.Commentaire, CommentaireAdmin)

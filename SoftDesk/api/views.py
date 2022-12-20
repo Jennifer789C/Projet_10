@@ -1,19 +1,20 @@
 from django.contrib.auth import get_user_model
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 from .serializers import ProjetListeSerializer, ProjetDetailSerializer, \
-    ContributeurListeSerializer, ContributeurAjoutSerializer
-from .models import Projet
+    ContributeurListeSerializer, ContributeurAjoutSerializer, \
+    ProblemeListeSerializer, ProblemeDetailSerializer, ProblemeModifSerializer, \
+    CommentaireListeSerializer, CommentaireDetailSerializer
+from .models import Projet, Probleme, Commentaire
 from connexion.models import Contributeur
 from connexion.permissions import EstContributeur, EstResponsable, \
-    EstResponsableProjet
+    EstResponsableProjet, EstAuteurProbleme, EstAuteurComment
 
 User = get_user_model()
 
 
 class ProjetViewset(ModelViewSet):
-    serializer_class = ProjetListeSerializer
-    detail_serializer_class = ProjetDetailSerializer
+    http_method_names = ["get", "post", "put", "delete"]
 
     def get_queryset(self):
         contributeurs = Contributeur.objects.filter(user=self.request.user)
@@ -30,16 +31,18 @@ class ProjetViewset(ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == "list" or self.action == "create":
-            return super().get_serializer_class()
-        return self.detail_serializer_class
+            return ProjetListeSerializer
+        return ProjetDetailSerializer
 
     def get_permissions(self):
-        if self.action == "create" or \
-                self.action == "list" or \
+        if self.action == "list" or \
+                self.action == "create" or \
                 self.action == "retrieve":
             permission_classes = [IsAuthenticated]
-        else:
+        elif self.action == "update" or self.action == "destroy":
             permission_classes = [IsAuthenticated, EstResponsableProjet]
+        else:
+            permission_classes = [IsAdminUser]
         return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
@@ -51,22 +54,97 @@ class ProjetViewset(ModelViewSet):
 
 
 class UserViewset(ModelViewSet):
+    http_method_names = ["get", "post", "delete"]
+
     def get_queryset(self):
         return Contributeur.objects.filter(projet=self.kwargs["projects_pk"])
 
     def get_serializer_class(self):
         if self.action == "list":
             return ContributeurListeSerializer
-        elif self.action == "create":
-            return ContributeurAjoutSerializer
+        return ContributeurAjoutSerializer
 
     def get_permissions(self):
         if self.action == "list":
             permission_classes = [IsAuthenticated, EstContributeur]
-        else:
+        elif self.action == "create" or self.action == "destroy":
             permission_classes = [IsAuthenticated, EstResponsable]
+        else:
+            permission_classes = [IsAdminUser]
         return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
         projet = Projet.objects.get(id=self.kwargs["projects_pk"])
         serializer.save(projet=projet, role="Contributeur")
+
+
+class ProblemeViewset(ModelViewSet):
+    http_method_names = ["get", "post", "put", "delete"]
+
+    def get_queryset(self):
+        return Probleme.objects.filter(projet=self.kwargs["projects_pk"])
+
+    def get_serializer_class(self):
+        if self.action == "list" or self.action == "create":
+            return ProblemeListeSerializer
+        elif self.action == "update":
+            return ProblemeModifSerializer
+        else:
+            return ProblemeDetailSerializer
+
+    def get_permissions(self):
+        if self.action == "list" or \
+                self.action == "create" or \
+                self.action == "retrieve":
+            permission_classes = [IsAuthenticated, EstContributeur]
+        elif self.action == "update" or self.action == "destroy":
+            permission_classes = [IsAuthenticated, EstAuteurProbleme]
+        else:
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
+
+    def perform_create(self, serializer):
+        projet = Projet.objects.get(id=self.kwargs["projects_pk"])
+        auteur = self.request.user
+        serializer.save(projet=projet, auteur=auteur, assigne=auteur)
+
+    def perform_update(self, serializer):
+        projet = Projet.objects.get(id=self.kwargs["projects_pk"])
+        auteur = self.request.user
+        serializer.save(projet=projet, auteur=auteur)
+
+
+class CommentaireViewset(ModelViewSet):
+    http_method_names = ["get", "post", "put", "delete"]
+
+    def get_queryset(self):
+        return Commentaire.objects.filter(probleme=self.kwargs["issues_pk"])
+
+    def get_serializer_class(self):
+        if self.action == "list" or \
+                self.action == "create" or \
+                self.action == "update":
+            return CommentaireListeSerializer
+        else:
+            return CommentaireDetailSerializer
+
+    def get_permissions(self):
+        if self.action == "list" or \
+                self.action == "create" or \
+                self.action == "retrieve":
+            permission_classes = [IsAuthenticated, EstContributeur]
+        elif self.action == "update" or self.action == "destroy":
+            permission_classes = [IsAuthenticated, EstAuteurComment]
+        else:
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
+
+    def perform_create(self, serializer):
+        probleme = Probleme.objects.get(id=self.kwargs["issues_pk"])
+        auteur = self.request.user
+        serializer.save(probleme=probleme, auteur=auteur)
+
+    def perform_update(self, serializer):
+        probleme = Probleme.objects.get(id=self.kwargs["issues_pk"])
+        auteur = self.request.user
+        serializer.save(probleme=probleme, auteur=auteur)
