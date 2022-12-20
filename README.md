@@ -48,7 +48,7 @@ dans le fichier requirements.txt :
 pip install -r requirements.txt
 ```
 
-### 3. Ouvrir le site et le parcourir
+### 3. Lancer le serveur et parcourir l'API
 
 Se placer dans le répertoire du projet Django :
 ```bash
@@ -62,7 +62,7 @@ Se connecter à Postman afin de parcourir les différents endpoints.
 La documentation de cette API se trouve à l'adresse suivante :  
 https://documenter.getpostman.com/view/23176759/2s8YzZQzbA
 
-### 3. Détails de connexion des utilisateurs déjà inscrits
+### 4. Détails de connexion des utilisateurs déjà inscrits
 
 Quatre utilisateurs sont déjà inscrits et présents dans la base de données :  
 

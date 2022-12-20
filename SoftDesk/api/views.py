@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 from .serializers import ProjetListeSerializer, ProjetDetailSerializer, \
     ContributeurListeSerializer, ContributeurAjoutSerializer, \
@@ -14,6 +14,8 @@ User = get_user_model()
 
 
 class ProjetViewset(ModelViewSet):
+    http_method_names = ["get", "post", "put", "delete"]
+
     def get_queryset(self):
         contributeurs = Contributeur.objects.filter(user=self.request.user)
         non_contributeurs = Contributeur.objects.all().exclude(
@@ -37,8 +39,10 @@ class ProjetViewset(ModelViewSet):
                 self.action == "create" or \
                 self.action == "retrieve":
             permission_classes = [IsAuthenticated]
-        else:
+        elif self.action == "update" or self.action == "destroy":
             permission_classes = [IsAuthenticated, EstResponsableProjet]
+        else:
+            permission_classes = [IsAdminUser]
         return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
@@ -50,20 +54,23 @@ class ProjetViewset(ModelViewSet):
 
 
 class UserViewset(ModelViewSet):
+    http_method_names = ["get", "post", "delete"]
+
     def get_queryset(self):
         return Contributeur.objects.filter(projet=self.kwargs["projects_pk"])
 
     def get_serializer_class(self):
         if self.action == "list":
             return ContributeurListeSerializer
-        elif self.action == "create":
-            return ContributeurAjoutSerializer
+        return ContributeurAjoutSerializer
 
     def get_permissions(self):
         if self.action == "list":
             permission_classes = [IsAuthenticated, EstContributeur]
-        else:
+        elif self.action == "create" or self.action == "destroy":
             permission_classes = [IsAuthenticated, EstResponsable]
+        else:
+            permission_classes = [IsAdminUser]
         return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
@@ -72,6 +79,8 @@ class UserViewset(ModelViewSet):
 
 
 class ProblemeViewset(ModelViewSet):
+    http_method_names = ["get", "post", "put", "delete"]
+
     def get_queryset(self):
         return Probleme.objects.filter(projet=self.kwargs["projects_pk"])
 
@@ -88,8 +97,10 @@ class ProblemeViewset(ModelViewSet):
                 self.action == "create" or \
                 self.action == "retrieve":
             permission_classes = [IsAuthenticated, EstContributeur]
-        else:
+        elif self.action == "update" or self.action == "destroy":
             permission_classes = [IsAuthenticated, EstAuteurProbleme]
+        else:
+            permission_classes = [IsAdminUser]
         return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
@@ -104,6 +115,8 @@ class ProblemeViewset(ModelViewSet):
 
 
 class CommentaireViewset(ModelViewSet):
+    http_method_names = ["get", "post", "put", "delete"]
+
     def get_queryset(self):
         return Commentaire.objects.filter(probleme=self.kwargs["issues_pk"])
 
@@ -120,8 +133,10 @@ class CommentaireViewset(ModelViewSet):
                 self.action == "create" or \
                 self.action == "retrieve":
             permission_classes = [IsAuthenticated, EstContributeur]
-        else:
+        elif self.action == "update" or self.action == "destroy":
             permission_classes = [IsAuthenticated, EstAuteurComment]
+        else:
+            permission_classes = [IsAdminUser]
         return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
