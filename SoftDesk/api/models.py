@@ -30,7 +30,7 @@ class Probleme(models.Model):
         Tache = "Tache"
 
     class Statut(models.TextChoices):
-        A_faire = "À faire"
+        A_faire = "A faire"
         En_cours = "En cours"
         Termine = "Terminé"
 
