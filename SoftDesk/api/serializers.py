@@ -65,7 +65,17 @@ class ProblemeModifSerializer(ModelSerializer):
     class Meta:
         model = Probleme
         fields = ["id", "titre", "description", "balise", "priorite", "statut",
-                  "assigne"]
+                  "assigne", "projet"]
+        extra_kwargs = {"projet": {"default": 6}}
+
+    def validate(self, data):
+        contributeurs = Contributeur.objects.filter(projet=data["projet"])
+        liste = []
+        for contributeur in contributeurs:
+            liste.append(contributeur.user)
+        if data["assigne"] not in liste:
+            raise ValidationError("L'assigné doit être contributeur au projet")
+        return data
 
 
 class ProblemeDetailSerializer(ModelSerializer):
