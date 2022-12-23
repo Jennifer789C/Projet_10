@@ -69,10 +69,10 @@ Quatre utilisateurs sont déjà inscrits et présents dans la base de données :
     - un superuser (id : 1) : 
         * mail : admin@mail.fr  
         * mot de passe : mdpAdmin  
-        * responsable du projet (id) : 1 
-        * contributeur du projet (id) : 1
-        * auteur du problème (id) : 4 (projet 1)
-        * auteur du commentaire (id) : 1 du problème 1
+        * responsable du projet (id) : 1, 6
+        * contributeur du projet (id) : 1, 6
+        * auteur du problème (id) : 4 (projet 1), 6 (projet 6)
+        * auteur du commentaire (id) : 1 (problème 1), 4 (problème 6)
 
     - un 1er utilisateur (id : 2) :  
         * mail : jennifer@mail.fr  
@@ -86,7 +86,7 @@ Quatre utilisateurs sont déjà inscrits et présents dans la base de données :
         * mail : laura@mail.fr  
         * mot de passe : mdplaura 
         * responsable du projet (id) : néant
-        * contributeur du projet (id) : néant
+        * contributeur du projet (id) : 6
         * auteur du problème (id) : néant
         * auteur du commentaire (id) : néant 
 
