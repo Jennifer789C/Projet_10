@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.serializers import ValidationError
 from rest_framework.viewsets import ModelViewSet
 from .serializers import ProjetListeSerializer, ProjetDetailSerializer, \
     ContributeurListeSerializer, ContributeurAjoutSerializer, \
@@ -111,6 +112,12 @@ class ProblemeViewset(ModelViewSet):
     def perform_update(self, serializer):
         projet = Projet.objects.get(id=self.kwargs["projects_pk"])
         auteur = self.request.user
+        contributeurs = Contributeur.objects.filter(projet=projet)
+        liste = []
+        for contributeur in contributeurs:
+            liste.append(contributeur.user)
+        if serializer.validated_data["assigne"] not in liste:
+            raise ValidationError("l'assigné doit être contributeur au projet")
         serializer.save(projet=projet, auteur=auteur)
 
 
